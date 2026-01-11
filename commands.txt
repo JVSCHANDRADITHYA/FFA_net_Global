@@ -1,0 +1,3 @@
+# for Train
+
+python main.py --net ffa --trainset smoke_train --testset smoke_test --data_dir "D:\FFA-Net\data\Smokebench" --crop --crop_size 240
