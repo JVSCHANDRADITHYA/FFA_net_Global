@@ -1,6 +1,7 @@
-Official implementation : https://github.com/zhilin007/FFA-Net
-This is a Smokebench training version modified on the original FFA-Net code.
+Official implementation : https://github.com/zhilin007/FFA-Net.
 
+This is a Smokebench training version modified on the original FFA-Net code.
+You can download the complete Smokebench Dataset from the ./data directory
 ---
 
 by Xu Qin, Zhilin Wang et al.    Peking University and Beijing University of Aeronautics & Astronautics.
