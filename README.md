@@ -1,5 +1,6 @@
 ##  [FFA-Net: Feature Fusion Attention Network for Single Image Dehazing](https://arxiv.org/abs/1911.07559) (AAAI 2020)
- Official implementation.
+ Official implementation : https://github.com/zhilin007/FFA-Net
+ This is a Smokebench training version modified on the original FFA-Net code.
 
 ---
 
