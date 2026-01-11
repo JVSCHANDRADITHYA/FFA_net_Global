@@ -16,8 +16,8 @@ parser.add_argument('--resume',type=bool,default=True)
 parser.add_argument('--eval_step',type=int,default=5000)
 parser.add_argument('--lr', default=0.0001, type=float, help='learning rate')
 parser.add_argument('--model_dir',type=str,default='./trained_models/')
-parser.add_argument('--trainset',type=str,default='its_train')
-parser.add_argument('--testset',type=str,default='its_test')
+# parser.add_argument('--trainset',type=str,default='its_train')
+# parser.add_argument('--testset',type=str,default='its_test')
 parser.add_argument('--net',type=str,default='ffa')
 parser.add_argument('--gps',type=int,default=3,help='residual_groups')
 parser.add_argument('--blocks',type=int,default=20,help='residual_blocks')
@@ -26,6 +26,12 @@ parser.add_argument('--crop',action='store_true')
 parser.add_argument('--crop_size',type=int,default=240,help='Takes effect when using --crop ')
 parser.add_argument('--no_lr_sche',action='store_true',help='no lr cos schedule')
 parser.add_argument('--perloss',action='store_true',help='perceptual loss')
+parser.add_argument('--data_dir', type=str, default='D:/FFA-Net/data/Smokebench')
+parser.add_argument('--trainset', type=str, default='smoke_train')
+parser.add_argument('--testset', type=str, default='smoke_test')
+parser.add_argument('--workers', type=int, default=4)
+
+
 
 opt=parser.parse_args()
 opt.device='cuda' if torch.cuda.is_available() else 'cpu'

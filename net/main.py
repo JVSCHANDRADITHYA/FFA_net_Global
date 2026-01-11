@@ -14,18 +14,26 @@ warnings.filterwarnings('ignore')
 from option import opt,model_name,log_dir
 from data_utils import *
 from torchvision.models import vgg16
+from data_utils_smokebench import SmokeBench_train_loader, SmokeBench_test_loader
+
+
 print('log_dir :',log_dir)
 print('model_name:',model_name)
 
 models_={
 	'ffa':FFA(gps=opt.gps,blocks=opt.blocks),
 }
-loaders_={
-	'its_train':ITS_train_loader,
-	'its_test':ITS_test_loader,
-	'ots_train':OTS_train_loader,
-	'ots_test':OTS_test_loader
+loaders_ = {
+    'its_train': ITS_train_loader,
+    'its_test': ITS_test_loader,
+    'ots_train': OTS_train_loader,
+    'ots_test': OTS_test_loader,
+
+    # ---- SmokeBench ----
+    'smoke_train': SmokeBench_train_loader,
+    'smoke_test': SmokeBench_test_loader
 }
+
 start_time=time.time()
 T=opt.steps	
 def lr_schedule_cosdecay(t,T,init_lr=opt.lr):
@@ -59,7 +67,14 @@ def train(net,loader_train,loader_test,optim,criterion):
 			lr=lr_schedule_cosdecay(step,T)
 			for param_group in optim.param_groups:
 				param_group["lr"] = lr  
-		x,y=next(iter(loader_train))
+		if step == start_step + 1:
+			train_iter = iter(loader_train)
+		try:
+			x, y = next(train_iter)
+		except StopIteration:
+			train_iter = iter(loader_train)
+			x, y = next(train_iter)
+
 		x=x.to(opt.device);y=y.to(opt.device)
 		out=net(x)
 		loss=criterion[0](out,y)
@@ -136,8 +151,9 @@ def test(net,loader_test,max_psnr,max_ssim,step):
 
 
 if __name__ == "__main__":
-	loader_train=loaders_[opt.trainset]
-	loader_test=loaders_[opt.testset]
+	loader_train = loaders_[opt.trainset](opt)
+	loader_test  = loaders_[opt.testset](opt)
+
 	net=models_[opt.net]
 	net=net.to(opt.device)
 	if opt.device=='cuda':
