@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 
 import torch
+import torch.nn as nn
 import torchvision.transforms as tfs
 import torchvision.utils as vutils
 
@@ -30,13 +31,9 @@ def compute_metrics(pred, gt):
 # ---------------- MAIN ----------------
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--task', type=str, default='smoke', help='its or ots or smoke')
-    parser.add_argument(
-        '--test_imgs',
-        type=str,
-        required=True,
-        help='Path to Smokebench/Test folder'
-    )
+    parser.add_argument('--task', type=str, default='smoke', help='its or ots')
+    parser.add_argument('--test_imgs', type=str, required=True,
+                        help='Path to Smokebench/Test folder')
     args = parser.parse_args()
 
     BASE_DIR = os.getcwd()
@@ -49,7 +46,7 @@ def main():
     assert os.path.exists(CLEAR_DIR), f"Missing folder: {CLEAR_DIR}"
 
     # ---------------- OUTPUT ----------------
-    output_dir = os.path.join(BASE_DIR, f'net/pred_FFA_{args.task}')
+    output_dir = os.path.join(BASE_DIR, f'pred_FFA_{args.task}')
     os.makedirs(output_dir, exist_ok=True)
 
     print("Pred dir :", output_dir)
@@ -59,14 +56,11 @@ def main():
     # ---------------- MODEL ----------------
     gps = 3
     blocks = 20
-
     model_path = os.path.join(
-        BASE_DIR,
-        f'net/trained_models/{args.task}_train_ffa_{gps}_{blocks}.pk'
+        BASE_DIR, f'net/trained_models/{args.task}_train_ffa_{gps}_{blocks}.pk'
     )
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print("Using device:", device)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     checkpoint = torch.load(
         model_path,
@@ -75,17 +69,16 @@ def main():
     )
 
     net = FFA(gps=gps, blocks=blocks)
-    net.load_state_dict(checkpoint['model'])  # ✅ FIXED
-    net.to(device)
+    net = nn.DataParallel(net)
+    net.load_state_dict(checkpoint['model'])
     net.eval()
+    net.to(device)
 
     # ---------------- TRANSFORMS ----------------
     input_transform = tfs.Compose([
         tfs.ToTensor(),
-        tfs.Normalize(
-            mean=[0.64, 0.6, 0.58],
-            std=[0.14, 0.15, 0.152]
-        )
+        tfs.Normalize(mean=[0.64, 0.6, 0.58],
+                      std=[0.14, 0.15, 0.152])
     ])
 
     to_tensor = tfs.ToTensor()

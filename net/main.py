@@ -156,9 +156,9 @@ if __name__ == "__main__":
 
 	net=models_[opt.net]
 	net=net.to(opt.device)
-	if opt.device=='cuda':
-		net=torch.nn.DataParallel(net)
-		cudnn.benchmark=True
+	if opt.device == 'cuda':
+		cudnn.benchmark = True
+
 	criterion = []
 	criterion.append(nn.L1Loss().to(opt.device))
 	if opt.perloss:
